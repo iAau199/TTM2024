@@ -23,4 +23,4 @@ Guidelines for contributing to my project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This work is licensed under CC BY-SA 4.0 - see the [LICENSE.md](LICENSE.md) file for details.
