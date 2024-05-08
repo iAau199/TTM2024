@@ -17,6 +17,7 @@ Instructions for installing and setting up my project.
 Examples and instructions for using my project.
 
 ## Directory Structure
+```
 audio2midi/
 │
 ├── src/
@@ -36,6 +37,7 @@ audio2midi/
     │
     └── performance/
         └── test_performance.py
+```
 
 
 ## License
