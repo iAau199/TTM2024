@@ -33,9 +33,7 @@ if __name__ == '__main__':
 
     filename = 'f0.csv'
 
-    with open(filename, 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerows(f0)
+    np.savetxt(filename, f0, delimiter=',', fmt='%s')
 
     maxplotfreq = 500.0    
     fig = plt.figure(figsize=(15, 9))
