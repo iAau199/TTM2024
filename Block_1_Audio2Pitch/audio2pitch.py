@@ -1,6 +1,8 @@
 import sys
+import csv
 import matplotlib.pyplot as plt
 import numpy as np
+from playsound import playsound
 
 from scipy.signal import get_window
 sys.path.append("PSPM/")
@@ -11,9 +13,9 @@ import stft
 
 
 if __name__ == '__main__':
-    input_file = 'sounds/cello-double-2.wav'
+    input_file = 'sounds/flute-A4.wav'
+    #playsound('sounds/cello-double-2.wav')
         
-    ### Change these analysis parameter values marked as XX
 
     window = 'hamming'
     M = 8000
@@ -21,17 +23,19 @@ if __name__ == '__main__':
     f0et = 10
     t = -55
     minf0 = 120
-    maxf0 = 200
+    maxf0 = 500
 
 
-    # No need to modify the code below, just understand it
     H = 256 
     fs, x = UF.wavread(input_file) 
     w  = get_window(window, M)   
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
 
+    filename = 'f0.csv'
 
-
+    with open(filename, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerows(f0)
 
     maxplotfreq = 500.0    
     fig = plt.figure(figsize=(15, 9))
@@ -49,3 +53,5 @@ if __name__ == '__main__':
     plt.xlabel('Time (s)')
     plt.legend(('f0',))
     plt.show()
+
+    
