@@ -12,18 +12,48 @@ import harmonicModel as HM
 import stft
 
 
+################################################################
+#HOW TO USE THIS CODE:
+#Right after executing enter 1, 2 or 3 in the terminal.
+#1: For melodies with a fundemental frequency between 120 and 500 Hz.
+#2: For melodies with a fundemental frequency between 500 and 1000 Hz.
+#3: Diferent type of window with different paramenters. (Usage and parameters still in work)
+#OUTPUT:
+#The script displays the histogram of the sound with the fundemental frequency highlited in a black line.
+#The fundemental frequency is also stored in a .cvs file.
+################################################################
+
+
 if __name__ == '__main__':
     input_file = 'sounds/flute-A4.wav'
     #playsound('sounds/cello-double-2.wav')
         
+    selected = int(input())
 
-    window = 'hamming'
-    M = 8000
-    N = 8192
-    f0et = 10
-    t = -55
-    minf0 = 120
-    maxf0 = 500
+    if selected == 1:       #Normal option
+        window = 'hamming'
+        M = 8000
+        N = 8192
+        f0et = 10
+        t = -55
+        minf0 = 120
+        maxf0 = 500
+    elif selected == 2:     #High frequency option
+        window = 'hamming'
+        M = 8000
+        N = 8192
+        f0et = 10
+        t = -55
+        minf0 = 500
+        maxf0 = 1000
+    elif selected == 3:     #Secondary option (still in prossess)
+        window = 'blackman'
+        M = 16000
+        N = 16384
+        f0et = 10
+        t = -33
+        minf0 = 120
+        maxf0 = 300
 
 
     H = 256 
