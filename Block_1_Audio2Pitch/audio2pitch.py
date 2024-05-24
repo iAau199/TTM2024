@@ -2,7 +2,6 @@ import sys
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-from playsound import playsound
 
 from scipy.signal import get_window
 sys.path.append("PSPM/")
@@ -14,7 +13,8 @@ import stft
 
 ################################################################
 #HOW TO USE THIS CODE:
-#Right after executing enter 1, 2 or 3 in the terminal.
+#Right after executing, write the name of the audio file you want to use.
+#After that, enter 1, 2 or 3 in the terminal.
 #1: For melodies with a fundemental frequency between 120 and 500 Hz.
 #2: For melodies with a fundemental frequency between 500 and 1000 Hz.
 #3: Diferent type of window with different paramenters. (Usage and parameters still in work)
@@ -25,8 +25,13 @@ import stft
 
 
 if __name__ == '__main__':
-    input_file = 'sounds/flute-A4.wav'
-    #playsound('sounds/cello-double-2.wav')
+
+    audioName = input()
+    nameSplit = audioName.split(".")
+    if nameSplit[-1] == 'wav':
+        input_file = 'sounds/'+audioName
+    else:
+        input_file = 'sounds/'+audioName+'.wav'
         
     selected = int(input())
 
