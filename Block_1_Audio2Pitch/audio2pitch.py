@@ -2,6 +2,7 @@ import sys
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+import librosa as li
 
 from scipy.signal import get_window
 sys.path.append("PSPM/")
@@ -16,8 +17,14 @@ import stft
 #Right after executing, write the name of the audio file you want to use.
 #After that, enter 1, 2 or 3 in the terminal.
 #1: For melodies with a fundemental frequency between 120 and 500 Hz.
-#2: For melodies with a fundemental frequency between 500 and 1000 Hz.
-#3: Diferent type of window with different paramenters. (Usage and parameters still in work)
+#2: For human voice audios:
+#### After selecting human voices, select the pitch of the audio:
+#### 1: low frequencies (80-500 Hz)
+#### 2: high frequencies (500-1000 Hz)
+#3: For instruments audio:
+#### 1: low frequencies (80-500 Hz)
+#### 2: medium frequencies (500-1000 Hz)
+#### 3: high frequencies (1000-10000 Hz)
 #OUTPUT:
 #The script displays the histogram of the sound with the fundemental frequency highlited in a black line.
 #The fundemental frequency is also stored in a .cvs file.
@@ -44,25 +51,43 @@ if __name__ == '__main__':
         minf0 = 120
         maxf0 = 500
     elif selected == 2:     #High frequency option
-        window = 'hamming'
+        window = 'blackman'
         M = 8000
         N = 8192
         f0et = 10
         t = -55
-        minf0 = 500
-        maxf0 = 1000
+        selected = int(input())
+        if selected == 1:
+            minf0 = 80
+            maxf0 = 500
+        elif selected == 2:
+            minf0 = 500
+            maxf0 = 1000
+
     elif selected == 3:     #Secondary option (still in prossess)
-        window = 'blackman'
+        window = 'hann'
         M = 16000
         N = 16384
         f0et = 10
         t = -33
-        minf0 = 120
-        maxf0 = 300
+        selected = int(input())
+        if selected == 1:
+            minf0 = 80
+            maxf0 = 500
+        elif selected == 2:
+            minf0 = 500
+            maxf0 = 1000
+        elif selected == 3:
+            minf0 = 1000
+            maxf0 = 10000
 
 
     H = 256 
-    fs, x = UF.wavread(input_file) 
+    x, fs = li.load(input_file)
+    bpm, _ = li.beat.beat_track(y=x, sr=fs)
+    print(bpm)
+
+
     w  = get_window(window, M)   
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
 
