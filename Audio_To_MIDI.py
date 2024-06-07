@@ -6,6 +6,8 @@ if __name__ == "__main__":
   #CALL AUDIO2PITCH FUNCTIONS --> WE NEED CSV, TEMPO, HOP_SIZE
   H, tempo = a2p.audiotopitch()
   
+  print(tempo)
+
   sampling_rate = 44100
 
   pitch_signal = p2m.csv_to_array("f0.csv")

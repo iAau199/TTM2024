@@ -77,6 +77,15 @@ def create_array(midi_notes, toggles, time):
 
     return note_times
 
+def increase_volume(input_file, output_file, volume_factor):
+    mid = mido.MidiFile(input_file)
+    for i, track in enumerate(mid.tracks):
+        for msg in track:
+            if msg.type == 'note_on':
+                # Increase the velocity by the volume factor, but cap it at 127 (MIDI max value)
+                msg.velocity = min(127, int(msg.velocity * volume_factor))
+    mid.save(output_file)
+
 def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
   mid = MidiFile()
   track = MidiTrack()
@@ -105,3 +114,4 @@ def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
     previous_end_time_ticks = end_time_ticks
 
   mid.save(filename)
+increase_volume('output.mid', 'outputHigh.mid', 10)
