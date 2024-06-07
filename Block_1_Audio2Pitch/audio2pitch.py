@@ -1,3 +1,4 @@
+import os
 import sys
 import csv
 import matplotlib.pyplot as plt
@@ -5,7 +6,7 @@ import numpy as np
 import librosa as li
 
 from scipy.signal import get_window
-sys.path.append("PSPM/")
+sys.path.append('Block_1_Audio2Pitch/PSPM/')
 import dftModel as DFT
 import utilFunctions as UF
 import harmonicModel as HM
@@ -31,14 +32,14 @@ import stft
 ################################################################
 
 
-if __name__ == '__main__':
+def audiotopitch():
 
     audioName = input()
     nameSplit = audioName.split(".")
     if nameSplit[-1] == 'wav':
-        input_file = 'sounds/'+audioName
+        input_file = 'Block_1_Audio2Pitch/sounds/'+audioName
     else:
-        input_file = 'sounds/'+audioName+'.wav'
+        input_file = 'Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
         
     selected = int(input())
 
@@ -63,7 +64,6 @@ if __name__ == '__main__':
         elif selected == 2:
             minf0 = 500
             maxf0 = 1000
-
     elif selected == 3:     #Secondary option (still in prossess)
         window = 'hann'
         M = 16000
@@ -85,7 +85,6 @@ if __name__ == '__main__':
     H = 256 
     x, fs = li.load(input_file)
     bpm, _ = li.beat.beat_track(y=x, sr=fs)
-    print(bpm)
 
 
     w  = get_window(window, M)   
@@ -111,5 +110,7 @@ if __name__ == '__main__':
     plt.xlabel('Time (s)')
     plt.legend(('f0',))
     plt.show()
+
+    return H, bpm
 
     
