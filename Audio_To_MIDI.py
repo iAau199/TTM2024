@@ -16,3 +16,8 @@ if __name__ == "__main__":
   note_times = p2m.detect_note_times(pitch_signal, H, sampling_rate)
   midi_conversion = p2m.create_array(midi_notes, note_toggles, note_times)
   p2m.save_to_midi(midi_conversion, tempo)
+  
+  # H, tempo = a2p.audiotopitch()
+
+  # sampling_rate = 44100
+  # p2m.pitch2midi(H, tempo, sampling_rate)

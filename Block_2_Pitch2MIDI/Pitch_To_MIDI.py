@@ -115,3 +115,12 @@ def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
 
   mid.save(filename)
 increase_volume('output.mid', 'outputHigh.mid', 10)
+
+
+def pitch2midi(H, tempo, sampling_rate, f0_file="f0.csv"):
+    pitch_signal = csv_to_array(f0_file)
+    midi_notes = detect_midi_notes(pitch_signal)
+    note_toggles = detect_note_toggles(midi_notes)
+    note_times = detect_note_times(pitch_signal, H, sampling_rate)
+    midi_conversion = create_array(midi_notes, note_toggles, note_times)
+    save_to_midi(midi_conversion, tempo)
