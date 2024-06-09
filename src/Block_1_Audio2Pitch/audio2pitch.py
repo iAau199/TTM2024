@@ -76,9 +76,9 @@ def audiotopitch():
     w  = get_window(window, M)   
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
 
-    filename = 'f0.csv'
+    output_dir = 'output/f0.csv'
 
-    np.savetxt(filename, f0, delimiter=',', fmt='%s')
+    np.savetxt(output_dir, f0, delimiter=',', fmt='%s')
 
     maxplotfreq = 500.0    
     fig = plt.figure(figsize=(15, 9))

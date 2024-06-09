@@ -1,5 +1,5 @@
 from Block_1_Audio2Pitch import audio2pitch as a2p
-from Block_2_Pitch2MIDI import Pitch_To_MIDI as p2m
+from Block_2_Pitch2MIDI import pitch2midi as p2m
 
 
 if __name__ == "__main__":

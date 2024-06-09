@@ -3,6 +3,7 @@ import mido
 from mido import MidiFile, MidiTrack, Message
 import csv
 
+output_dir = 'outputs/'
 
 def csv_to_array(filename):
   pitch_array = []
@@ -82,7 +83,7 @@ def increase_volume(input_file, output_file, volume_factor):
                 msg.velocity = min(127, int(msg.velocity * volume_factor))
     mid.save(output_file)
 
-def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
+def save_to_midi(midi_conversion, tempo, filename = output_dir + 'output.mid'):
   mid = MidiFile()
   track = MidiTrack()
   mid.tracks.append(track)
@@ -110,12 +111,12 @@ def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
 
   mid.save(filename)
 
-def pitch2midi(H, tempo, sampling_rate, f0_file="f0.csv"):
+def pitch2midi(H, tempo, sampling_rate, f0_file= output_dir + 'f0.csv'):
     pitch_signal = csv_to_array(f0_file)
     midi_notes = detect_midi_notes(pitch_signal)
     note_toggles = detect_note_toggles(midi_notes)
     note_times = detect_note_times(pitch_signal, H, sampling_rate)
     midi_conversion = create_array(midi_notes, note_toggles, note_times)
     save_to_midi(midi_conversion, tempo)
-    increase_volume('output.mid', 'outputHigh.mid', 10)
+    increase_volume(output_dir + 'output.mid', output_dir + 'outputHigh.mid', 10)
     
