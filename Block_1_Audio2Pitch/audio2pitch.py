@@ -41,23 +41,13 @@ def audiotopitch():
     else:
         input_file = 'Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
         
-    selected = int(input())
+    selected = int(input("Select option (1, 2, 3): "))
 
     if selected == 1:       #Normal option
-        window = 'hamming'
-        M = 8000
-        N = 8192
-        f0et = 10
-        t = -55
-        minf0 = 120
-        maxf0 = 500
+        window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
     elif selected == 2:     #High frequency option
-        window = 'blackman'
-        M = 8000
-        N = 8192
-        f0et = 10
-        t = -55
-        selected = int(input())
+        window, M, N, f0et, t = 'blackman', 8000, 8192, 10, -55
+        selected = int(input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz): "))
         if selected == 1:
             minf0 = 80
             maxf0 = 500
@@ -65,12 +55,8 @@ def audiotopitch():
             minf0 = 500
             maxf0 = 1000
     elif selected == 3:     #Secondary option (still in prossess)
-        window = 'hann'
-        M = 16000
-        N = 16384
-        f0et = 10
-        t = -33
-        selected = int(input())
+        window, M, N, f0et, t = 'hann', 16000, 16384, 10, -33
+        selected = int(input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz, 3 for 1000-10000Hz): "))
         if selected == 1:
             minf0 = 80
             maxf0 = 500
@@ -100,8 +86,8 @@ def audiotopitch():
     mX, pX = stft.stftAnal(x, w, N, H) 
     mX = np.transpose(mX[:,:int(N*(maxplotfreq/fs))+1])
         
-    timeStamps = np.arange(mX.shape[1])*H/float(fs)                             
-    binFreqs = np.arange(mX.shape[0])*fs/float(N)
+    timeStamps = np.arange(mX.shape[1]) * H / float(fs)                             
+    binFreqs = np.arange(mX.shape[0]) * fs / float(N)
         
     plt.pcolormesh(timeStamps, binFreqs, mX, shading='auto')
     plt.plot(timeStamps, f0, color = 'k', linewidth=1.5)

@@ -4,7 +4,6 @@ from mido import MidiFile, MidiTrack, Message
 import csv
 
 
-
 def csv_to_array(filename):
   pitch_array = []
 
@@ -17,7 +16,6 @@ def csv_to_array(filename):
 
 def detect_midi_notes(pitch_signal):
   
-
   notes = []
   midi_notes = []
 
@@ -57,11 +55,9 @@ def detect_note_toggles(pitch_signal):
             start = i
 
     note_toggles.append((start, len(pitch_signal) - 1))
-
     return note_toggles
 
 def detect_note_times(pitch_array, hop_size, sampling_rate):
-  
   frame_ids = list(range(len(pitch_array)))
   timestamps = [(frame_id * hop_size) / sampling_rate for frame_id in frame_ids]
   return timestamps
@@ -92,7 +88,6 @@ def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
   mid.tracks.append(track)
 
   tempo = int(tempo[0])
-
   track.append(mido.MetaMessage('set_tempo', tempo=tempo))
 
   for start_time, end_time, note_pitch in midi_conversion:
@@ -114,8 +109,6 @@ def save_to_midi(midi_conversion, tempo, filename = "output.mid"):
     previous_end_time_ticks = end_time_ticks
 
   mid.save(filename)
-increase_volume('output.mid', 'outputHigh.mid', 10)
-
 
 def pitch2midi(H, tempo, sampling_rate, f0_file="f0.csv"):
     pitch_signal = csv_to_array(f0_file)
@@ -124,3 +117,5 @@ def pitch2midi(H, tempo, sampling_rate, f0_file="f0.csv"):
     note_times = detect_note_times(pitch_signal, H, sampling_rate)
     midi_conversion = create_array(midi_notes, note_toggles, note_times)
     save_to_midi(midi_conversion, tempo)
+    increase_volume('output.mid', 'outputHigh.mid', 10)
+    
