@@ -111,14 +111,15 @@ def save_to_midi(midi_conversion, tempo, filename=output_dir + 'output.mid'):
     # Save MIDI file
     mid.save(filename)
 
-def pitch2midi(H, tempo, sampling_rate, time_f0):
+def pitch2midi(H, tempo, sampling_rate, time_f0, audio_name):
     pitch_signal = time_f0[:, 1]
     timestamps = time_f0[:, 0]
     midi_notes = detect_midi_notes(pitch_signal)
     note_toggles = detect_note_toggles(midi_notes)
     note_times = detect_note_times(pitch_signal, H, sampling_rate)
     midi_conversion = create_array(midi_notes, note_toggles, timestamps)
-    save_to_midi(midi_conversion, tempo)
-    increase_volume(output_dir + 'output.mid', output_dir + 'outputHigh.mid', 10)
+    filename = output_dir + audio_name + '_output.mid'
+    save_to_midi(midi_conversion, tempo, filename)
+    increase_volume(filename, output_dir + audio_name + '_outputHigh.mid', 10)
     print("Finished pitch2midi.")
     

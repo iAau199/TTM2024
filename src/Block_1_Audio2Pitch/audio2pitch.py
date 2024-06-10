@@ -42,9 +42,8 @@ def get_user_input(prompt, valid_options):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-def audio2Pitch():
+def audio2Pitch(audioName):
 
-    audioName = input("Enter the name of the audio file: ")
     nameSplit = audioName.split(".")
     if nameSplit[-1] == 'wav':
         input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName
