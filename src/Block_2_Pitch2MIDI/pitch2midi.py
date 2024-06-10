@@ -3,7 +3,7 @@ import mido
 from mido import MidiFile, MidiTrack, Message
 import csv
 
-output_dir = 'outputs/'
+output_dir = 'src/outputs/'
 
 def csv_to_array(filename):
   pitch_array = []
@@ -16,8 +16,6 @@ def csv_to_array(filename):
   return pitch_array
 
 def detect_midi_notes(pitch_signal):
-  
-  notes = []
   midi_notes = []
 
   for pitch in pitch_signal:
@@ -30,19 +28,6 @@ def detect_midi_notes(pitch_signal):
 
   return midi_notes
 
-def detect_midi_notes(pitch_signal):
-  notes = []
-  midi_notes = []
-
-  for pitch in pitch_signal:
-    if pitch > 0:
-      note = librosa.hz_to_note(pitch)
-      midi_note = librosa.note_to_midi(note)
-      midi_notes.append(midi_note)
-    else:
-      midi_notes.append(0)
-
-  return midi_notes
 
 def detect_note_toggles(pitch_signal):
     note_toggles = []
@@ -111,12 +96,19 @@ def save_to_midi(midi_conversion, tempo, filename = output_dir + 'output.mid'):
 
   mid.save(filename)
 
-def pitch2midi(H, tempo, sampling_rate, f0_file= output_dir + 'f0.csv'):
-    pitch_signal = csv_to_array(f0_file)
+def pitch2midi(H, tempo, sampling_rate, f0):
+    print("Starting pitch2midi...")
+    pitch_signal = f0
     midi_notes = detect_midi_notes(pitch_signal)
+    print("Detected MIDI notes.")
     note_toggles = detect_note_toggles(midi_notes)
+    print("Detected note toggles.")
     note_times = detect_note_times(pitch_signal, H, sampling_rate)
+    print("Detected note times.")
     midi_conversion = create_array(midi_notes, note_toggles, note_times)
+    print("Created MIDI conversion array.")
     save_to_midi(midi_conversion, tempo)
+    print("Saved to MIDI file.")
     increase_volume(output_dir + 'output.mid', output_dir + 'outputHigh.mid', 10)
+    print("Finished pitch2midi.")
     

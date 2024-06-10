@@ -6,18 +6,15 @@ if __name__ == "__main__":
   #CALL AUDIO2PITCH FUNCTIONS --> WE NEED CSV, TEMPO, HOP_SIZE
   H, tempo, selected, time_f0 = a2p.audio2Pitch()
   
-  print(tempo)
+  print("tempo:",tempo)
 
   sampling_rate = 44100
 
-  pitch_signal = time_f0[:, 1] #p2m.csv_to_array("f0.csv")
-  midi_notes = p2m.detect_midi_notes(pitch_signal)
-  note_toggles = p2m.detect_note_toggles(midi_notes)
-  note_times = p2m.detect_note_times(pitch_signal, H, sampling_rate)
-  midi_conversion = p2m.create_array(midi_notes, note_toggles, note_times)
-  p2m.save_to_midi(midi_conversion, tempo)
+  # pitch_signal = time_f0[:, 1] #p2m.csv_to_array("f0.csv")
+  # midi_notes = p2m.detect_midi_notes(pitch_signal)
+  # note_toggles = p2m.detect_note_toggles(midi_notes)
+  # note_times = p2m.detect_note_times(pitch_signal, H, sampling_rate)
+  # midi_conversion = p2m.create_array(midi_notes, note_toggles, note_times)
+  # p2m.save_to_midi(midi_conversion, tempo)
   
-  # H, tempo = a2p.audiotopitch()
-
-  # sampling_rate = 44100
-  # p2m.pitch2midi(H, tempo, sampling_rate)
+  p2m.pitch2midi(H, tempo, sampling_rate, time_f0[:, 1])

@@ -6,7 +6,7 @@ import numpy as np
 import librosa as li
 
 from scipy.signal import get_window
-sys.path.append('Block_1_Audio2Pitch/PSPM/')
+sys.path.append('src/Block_1_Audio2Pitch/PSPM/')
 import dftModel as DFT
 import utilFunctions as UF
 import harmonicModel as HM
@@ -44,20 +44,20 @@ def get_user_input(prompt, valid_options):
 
 def audio2Pitch():
 
-    audioName = input()
+    audioName = input("Enter the name of the audio file: ")
     nameSplit = audioName.split(".")
     if nameSplit[-1] == 'wav':
-        input_file = 'Block_1_Audio2Pitch/sounds/'+audioName
+        input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName
     else:
-        input_file = 'Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
+        input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
         
-    selected = get_user_input("Select pitch range, [1] 80-500Hz, [2] 500-1000Hz, [3] 1000-10000Hz: ", [1, 2, 3])
+    selected = get_user_input("Select input audio type, [1] normal, [2] high freq., [3] in progress: ", [1, 2, 3])
 
     if selected == 1:       #Normal option
         window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
     elif selected == 2:     #High frequency option
         window, M, N, f0et, t = 'blackman', 8000, 8192, 10, -55
-        selected = get_user_input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz): ", [1, 2])
+        selected = get_user_input("Select pitch range [1] for 80-500Hz, [2] for 500-1000Hz): ", [1, 2])
         if selected == 1:
             minf0 = 80
             maxf0 = 500
@@ -66,7 +66,7 @@ def audio2Pitch():
             maxf0 = 1000
     elif selected == 3:     #Secondary option (still in prossess)
         window, M, N, f0et, t = 'hann', 16000, 16384, 10, -33
-        selected = get_user_input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz, 3 for 1000-10000Hz): ", [1, 2, 3])
+        selected = get_user_input("Select pitch range, [1] for 80-500Hz, [2] for 500-1000Hz, [3] for 1000-10000Hz): ", [1, 2, 3])
         if selected == 1:
             minf0 = 80
             maxf0 = 500
@@ -95,7 +95,7 @@ def audio2Pitch():
     timeStamps = np.arange(mX.shape[1]) * H / float(fs)                             
     binFreqs = np.arange(mX.shape[0]) * fs / float(N)
         
-    output_dir = 'output/f0.csv'
+    output_dir = 'src/outputs/f0.csv'
     # Combine timestamps and f0 values into one array
     output_data = np.column_stack((timeStamps, f0))
     np.savetxt(output_dir, output_data, delimiter=',', fmt='%s')
