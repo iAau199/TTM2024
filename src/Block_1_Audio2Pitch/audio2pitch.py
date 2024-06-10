@@ -88,7 +88,7 @@ def audio2Pitch():
     
 
     maxplotfreq = 500.0    
-    fig = plt.figure(figsize=(15, 9))
+    fig = plt.figure(figsize=(13, 7))
 
     mX, pX = stft.stftAnal(x, w, N, H) 
     mX = np.transpose(mX[:, :int(N * (maxplotfreq / fs)) + 1])

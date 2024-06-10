@@ -25,7 +25,7 @@ def detect_midi_notes(pitch_signal):
       midi_notes.append(midi_note)
     else:
       midi_notes.append(0)
-
+  print("midi_notes:", midi_notes)
   return midi_notes
 
 
@@ -41,7 +41,11 @@ def detect_note_toggles(pitch_signal):
             start = i
 
     note_toggles.append((start, len(pitch_signal) - 1))
-    return note_toggles
+    
+    filtered_toggles = [toggle for toggle in note_toggles if toggle[1] - toggle[0] > 3]
+    
+    print("note_toggles:", filtered_toggles)
+    return filtered_toggles
 
 def detect_note_times(pitch_array, hop_size, sampling_rate):
   frame_ids = list(range(len(pitch_array)))
@@ -53,10 +57,11 @@ def create_array(midi_notes, toggles, time):
 
     for toggle in toggles:
         start_index, end_index = toggle
+        midle_idx = start_index + round((end_index - start_index)/2)
         start_time = time[start_index]
         end_time = time[end_index]
-        note_times.append((start_time, end_time, midi_notes[start_index]))
-
+        note_times.append((start_time, end_time, midi_notes[midle_idx]))
+    print("note_times:", note_times)
     return note_times
 
 def increase_volume(input_file, output_file, volume_factor):
@@ -68,47 +73,52 @@ def increase_volume(input_file, output_file, volume_factor):
                 msg.velocity = min(127, int(msg.velocity * volume_factor))
     mid.save(output_file)
 
-def save_to_midi(midi_conversion, tempo, filename = output_dir + 'output.mid'):
-  mid = MidiFile()
-  track = MidiTrack()
-  mid.tracks.append(track)
+def save_to_midi(midi_conversion, tempo, filename=output_dir + 'output.mid'):
+    mid = MidiFile()
+    track = MidiTrack()
+    mid.tracks.append(track)
 
-  tempo = int(tempo[0])
-  track.append(mido.MetaMessage('set_tempo', tempo=tempo))
+    # Convert tempo to microseconds per beat
+    tempo_us_per_beat = int(mido.bpm2tempo(tempo[0]))
 
-  for start_time, end_time, note_pitch in midi_conversion:
-    ticks_per_beat = 480
+    # Set tempo in the MIDI file
+    track.append(mido.MetaMessage('set_tempo', tempo=tempo_us_per_beat))
+
     previous_end_time_ticks = 0
 
-    start_time_ticks = mido.second2tick(start_time, ticks_per_beat, tempo)
-    end_time_ticks = mido.second2tick(end_time, ticks_per_beat, tempo)
+    for start_time, end_time, note_pitch in midi_conversion:
+        ticks_per_beat = mid.ticks_per_beat
 
-    delta_time_on = start_time_ticks - previous_end_time_ticks
-    delta_time_off = end_time_ticks - start_time_ticks
+        # Convert start and end times to ticks
+        start_time_ticks = int(mido.second2tick(start_time, ticks_per_beat, tempo_us_per_beat))
+        end_time_ticks = int(mido.second2tick(end_time, ticks_per_beat, tempo_us_per_beat))
 
-    note_on = Message('note_on', note = note_pitch, time = int(delta_time_on))
-    note_off = Message('note_off', note = note_pitch, time = int(delta_time_off))
+        # Calculate the delta times for note_on and note_off events
+        delta_time_on = start_time_ticks - previous_end_time_ticks
+        delta_time_off = end_time_ticks - start_time_ticks
 
-    track.append(note_on)
-    track.append(note_off)
+        # Create note_on and note_off messages
+        note_on = Message('note_on', note=note_pitch, time=int(delta_time_on))
+        note_off = Message('note_off', note=note_pitch, time=int(delta_time_off))
 
-    previous_end_time_ticks = end_time_ticks
+        # Append messages to the track
+        track.append(note_on)
+        track.append(note_off)
 
-  mid.save(filename)
+        # Update previous end time
+        previous_end_time_ticks = end_time_ticks
 
-def pitch2midi(H, tempo, sampling_rate, f0):
-    print("Starting pitch2midi...")
-    pitch_signal = f0
+    # Save MIDI file
+    mid.save(filename)
+
+def pitch2midi(H, tempo, sampling_rate, time_f0):
+    pitch_signal = time_f0[:, 1]
+    timestamps = time_f0[:, 0]
     midi_notes = detect_midi_notes(pitch_signal)
-    print("Detected MIDI notes.")
     note_toggles = detect_note_toggles(midi_notes)
-    print("Detected note toggles.")
     note_times = detect_note_times(pitch_signal, H, sampling_rate)
-    print("Detected note times.")
-    midi_conversion = create_array(midi_notes, note_toggles, note_times)
-    print("Created MIDI conversion array.")
+    midi_conversion = create_array(midi_notes, note_toggles, timestamps)
     save_to_midi(midi_conversion, tempo)
-    print("Saved to MIDI file.")
     increase_volume(output_dir + 'output.mid', output_dir + 'outputHigh.mid', 10)
     print("Finished pitch2midi.")
     
