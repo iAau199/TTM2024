@@ -22,7 +22,7 @@ class TestPitchDetection(unittest.TestCase):
         f0 = f0Detection(self.x, self.fs, w, N, H, t, minf0, maxf0, 10)
         f0_evaluation = mir_eval.melody.evaluate(self.reference_f0[:, 0], self.reference_f0[:, 1], f0[:, 0], f0[:, 1])
         self.assertGreaterEqual(f0_evaluation['Overall Accuracy'], 0.9, "Pitch accuracy is below 90%")
-
+ 
     def test_voiced_measures(self):
         window = 'hamming'
         M = 8000
