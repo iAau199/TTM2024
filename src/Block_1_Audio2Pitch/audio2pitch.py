@@ -85,17 +85,30 @@ def audio2Pitch():
 
     w  = get_window(window, M)   
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
+    
 
     maxplotfreq = 500.0    
     fig = plt.figure(figsize=(15, 9))
 
     mX, pX = stft.stftAnal(x, w, N, H) 
     mX = np.transpose(mX[:, :int(N * (maxplotfreq / fs)) + 1])
+    print("mX shape:",mX.shape)
         
     timeStamps = np.arange(mX.shape[1]) * H / float(fs)                             
     binFreqs = np.arange(mX.shape[0]) * fs / float(N)
+    print("binFreqs:", binFreqs.shape)
+    print("timeStamps", timeStamps.shape)
+    
         
     output_dir = 'src/outputs/f0.csv'
+    
+    if timeStamps.shape[0] > f0.shape[0]:
+        # Discard the last entries in timeStamps
+        timeStamps = timeStamps[:f0.shape[0]]
+        mX = mX[:len(binFreqs), :len(timeStamps)]
+    elif timeStamps.shape[0] < f0.shape[0]:
+        # Discard the last entries in f0
+        f0 = f0[:timeStamps.shape[0]]
     # Combine timestamps and f0 values into one array
     output_data = np.column_stack((timeStamps, f0))
     np.savetxt(output_dir, output_data, delimiter=',', fmt='%s')
