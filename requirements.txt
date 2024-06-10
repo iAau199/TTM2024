@@ -1,6 +1,5 @@
 librosa
-#unittest
 mir_eval
 pretty_midi
-#midi
 matplotlib
+setuptools
