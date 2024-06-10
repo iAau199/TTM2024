@@ -31,8 +31,18 @@ import stft
 #The fundemental frequency is also stored in a .cvs file.
 ################################################################
 
+def get_user_input(prompt, valid_options):
+    while True:
+        try:
+            selected = int(input(prompt))
+            if selected in valid_options:
+                return selected
+            else:
+                print(f"Invalid option. Please select one of the following: {valid_options}")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
 
-def audiotopitch():
+def audio2Pitch():
 
     audioName = input()
     nameSplit = audioName.split(".")
@@ -41,13 +51,13 @@ def audiotopitch():
     else:
         input_file = 'Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
         
-    selected = int(input("Select option (1, 2, 3): "))
+    selected = get_user_input("Select pitch range, [1] 80-500Hz, [2] 500-1000Hz, [3] 1000-10000Hz: ", [1, 2, 3])
 
     if selected == 1:       #Normal option
         window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
     elif selected == 2:     #High frequency option
         window, M, N, f0et, t = 'blackman', 8000, 8192, 10, -55
-        selected = int(input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz): "))
+        selected = get_user_input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz): ", [1, 2])
         if selected == 1:
             minf0 = 80
             maxf0 = 500
@@ -56,7 +66,7 @@ def audiotopitch():
             maxf0 = 1000
     elif selected == 3:     #Secondary option (still in prossess)
         window, M, N, f0et, t = 'hann', 16000, 16384, 10, -33
-        selected = int(input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz, 3 for 1000-10000Hz): "))
+        selected = get_user_input("Select pitch range (1 for 80-500Hz, 2 for 500-1000Hz, 3 for 1000-10000Hz): ", [1, 2, 3])
         if selected == 1:
             minf0 = 80
             maxf0 = 500
@@ -76,19 +86,20 @@ def audiotopitch():
     w  = get_window(window, M)   
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
 
-    output_dir = 'output/f0.csv'
-
-    np.savetxt(output_dir, f0, delimiter=',', fmt='%s')
-
     maxplotfreq = 500.0    
     fig = plt.figure(figsize=(15, 9))
 
     mX, pX = stft.stftAnal(x, w, N, H) 
-    mX = np.transpose(mX[:,:int(N*(maxplotfreq/fs))+1])
+    mX = np.transpose(mX[:, :int(N * (maxplotfreq / fs)) + 1])
         
     timeStamps = np.arange(mX.shape[1]) * H / float(fs)                             
     binFreqs = np.arange(mX.shape[0]) * fs / float(N)
         
+    output_dir = 'output/f0.csv'
+    # Combine timestamps and f0 values into one array
+    output_data = np.column_stack((timeStamps, f0))
+    np.savetxt(output_dir, output_data, delimiter=',', fmt='%s')
+    
     plt.pcolormesh(timeStamps, binFreqs, mX, shading='auto')
     plt.plot(timeStamps, f0, color = 'k', linewidth=1.5)
         
@@ -97,6 +108,6 @@ def audiotopitch():
     plt.legend(('f0',))
     plt.show()
 
-    return H, bpm
+    return H, bpm, selected, output_data
 
     
