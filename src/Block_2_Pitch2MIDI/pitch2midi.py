@@ -25,7 +25,7 @@ def detect_midi_notes(pitch_signal):
       midi_notes.append(midi_note)
     else:
       midi_notes.append(0)
-  print("midi_notes:", midi_notes)
+  #print("midi_notes:", midi_notes)
   return midi_notes
 
 
@@ -44,7 +44,7 @@ def detect_note_toggles(pitch_signal):
     
     filtered_toggles = [toggle for toggle in note_toggles if toggle[1] - toggle[0] > 3]
     
-    print("note_toggles:", filtered_toggles)
+    #print("note_toggles:", filtered_toggles)
     return filtered_toggles
 
 def detect_note_times(pitch_array, hop_size, sampling_rate):
@@ -61,7 +61,7 @@ def create_array(midi_notes, toggles, time):
         start_time = time[start_index]
         end_time = time[end_index]
         note_times.append((start_time, end_time, midi_notes[midle_idx]))
-    print("note_times:", note_times)
+    #print("note_times:", note_times)
     return note_times
 
 def increase_volume(input_file, output_file, volume_factor):

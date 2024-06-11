@@ -44,7 +44,7 @@ def get_user_input(prompt, valid_options):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-def audio2Pitch(audioName):
+def audio2Pitch(audioName, flag=1):
 
     nameSplit = audioName.split(".")
     if nameSplit[-1] == 'wav':
@@ -100,7 +100,8 @@ def audio2Pitch(audioName):
     f0 = gaussian_filter1d(f0, sigma=2)
 
     # Plot the input audio spectrogram
-    plot_spectrogram(x, fs, H, N, w, audioName)
+    if flag == 1:
+        plot_spectrogram(x, fs, H, N, w, audioName)
     
 
     maxplotfreq = maxf0    
@@ -108,13 +109,9 @@ def audio2Pitch(audioName):
 
     mX, pX = stft.stftAnal(x, w, N, H) 
     mX = np.transpose(mX[:, :int(N * (maxplotfreq / fs)) + 1])
-    print("mX shape:",mX.shape)
         
     timeStamps = np.arange(mX.shape[1]) * H / float(fs)                             
-    binFreqs = np.arange(mX.shape[0]) * fs / float(N)
-    print("binFreqs:", binFreqs.shape)
-    print("timeStamps", timeStamps.shape)
-    
+    binFreqs = np.arange(mX.shape[0]) * fs / float(N)    
     
     if timeStamps.shape[0] > f0.shape[0]:
         # Discard the last entries in timeStamps
@@ -129,13 +126,14 @@ def audio2Pitch(audioName):
     output_data = np.column_stack((timeStamps, f0))
     np.savetxt(output_dir, output_data, delimiter=',', fmt='%s')
     
-    plt.pcolormesh(timeStamps, binFreqs, mX, shading='auto')
-    plt.plot(timeStamps, f0, color = 'k', linewidth=1.5)
-        
-    plt.ylabel('Frequency (Hz)')
-    plt.xlabel('Time (s)')
-    plt.legend(('f0',))
-    plt.show()
+    if flag == 1:
+        plt.pcolormesh(timeStamps, binFreqs, mX, shading='auto')
+        plt.plot(timeStamps, f0, color = 'k', linewidth=1.5)
+            
+        plt.ylabel('Frequency (Hz)')
+        plt.xlabel('Time (s)')
+        plt.legend(('f0',))
+        plt.show()
 
     return H, bpm, selected, output_data
 
