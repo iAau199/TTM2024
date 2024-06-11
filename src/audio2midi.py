@@ -11,3 +11,9 @@ if __name__ == "__main__":
     sampling_rate = 44100
   
     p2m.pitch2midi(H, tempo, sampling_rate, time_f0, audioName)
+    
+# def audio2midi(audioName):
+#     H, tempo, selected, time_f0 = a2p.audio2Pitch(audioName)
+#     sampling_rate = 44100
+#     p2m.pitch2midi(H, tempo, sampling_rate, time_f0, audioName)
+#     return audioName, H, tempo, sampling_rate
