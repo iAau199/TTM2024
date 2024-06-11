@@ -12,6 +12,8 @@ import utilFunctions as UF
 import harmonicModel as HM
 import stft
 
+from scipy.signal import get_window, medfilt
+from scipy.ndimage import gaussian_filter1d
 
 ################################################################
 #HOW TO USE THIS CODE:
@@ -50,7 +52,7 @@ def audio2Pitch(audioName):
     else:
         input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
         
-    selected = get_user_input("Select input audio type, [1] normal, [2] high freq., [3] in progress: ", [1, 2, 3])
+    selected = get_user_input("Select input audio type, [1] normal, [2] high freq., [3] in progress, [4] not sure: ", [1, 2, 3, 4])
 
     if selected == 1:       #Normal option
         window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
@@ -64,7 +66,7 @@ def audio2Pitch(audioName):
             minf0 = 500
             maxf0 = 1000
     elif selected == 3:     #Secondary option (still in prossess)
-        window, M, N, f0et, t = 'hann', 16000, 16384, 10, -33
+        window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
         selected = get_user_input("Select pitch range, [1] for 80-500Hz, [2] for 500-1000Hz, [3] for 1000-10000Hz): ", [1, 2, 3])
         if selected == 1:
             minf0 = 80
@@ -75,18 +77,33 @@ def audio2Pitch(audioName):
         elif selected == 3:
             minf0 = 1000
             maxf0 = 10000
+    elif selected == 4:     #Secondary option (still in prossess)
+        window, M, N, f0et, t = 'blackman', 8000, 8192, 10, -55
+        minf0 = int(input("Select min pitch range: "))
+        maxf0 = int(input("Select max pitch range: "))
 
 
     H = 256 
     x, fs = li.load(input_file)
     bpm, _ = li.beat.beat_track(y=x, sr=fs)
 
-
+    M = N
+    # minf0 = 250
+    # maxf0 = 1000
     w  = get_window(window, M)   
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
     
+    
+    # Smooth the f0 track using a median filter
+    f0 = medfilt(f0, kernel_size=5)
+    # Further smooth using Gaussian filter
+    f0 = gaussian_filter1d(f0, sigma=2)
 
-    maxplotfreq = 500.0    
+    # Plot the input audio spectrogram
+    plot_spectrogram(x, fs, H, N, w, audioName)
+    
+
+    maxplotfreq = maxf0    
     fig = plt.figure(figsize=(13, 7))
 
     mX, pX = stft.stftAnal(x, w, N, H) 
@@ -98,8 +115,6 @@ def audio2Pitch(audioName):
     print("binFreqs:", binFreqs.shape)
     print("timeStamps", timeStamps.shape)
     
-        
-    output_dir = 'src/outputs/f0.csv'
     
     if timeStamps.shape[0] > f0.shape[0]:
         # Discard the last entries in timeStamps
@@ -108,7 +123,9 @@ def audio2Pitch(audioName):
     elif timeStamps.shape[0] < f0.shape[0]:
         # Discard the last entries in f0
         f0 = f0[:timeStamps.shape[0]]
+        
     # Combine timestamps and f0 values into one array
+    output_dir = f'src/outputs/f0_{audioName}.csv'
     output_data = np.column_stack((timeStamps, f0))
     np.savetxt(output_dir, output_data, delimiter=',', fmt='%s')
     
@@ -122,4 +139,15 @@ def audio2Pitch(audioName):
 
     return H, bpm, selected, output_data
 
-    
+
+def plot_spectrogram(x, fs, H, N, w, audioName):
+    D = li.stft(x, n_fft=N, hop_length=H, window=w)
+    S_db = li.amplitude_to_db(np.abs(D), ref=np.max)
+
+    plt.figure(figsize=(14, 5))
+    li.display.specshow(S_db, sr=fs, hop_length=H, x_axis='time', y_axis='log')
+    plt.colorbar(format='%+2.0f dB')
+    plt.title(f'Spectrogram of {audioName} Audio')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Frequency (Hz)')
+    plt.show()

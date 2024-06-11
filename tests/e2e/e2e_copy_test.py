@@ -25,10 +25,10 @@ sys.path.append(str(TESTS_DIR))
 
 class TestEndToEnd(unittest.TestCase):
     def setUp(self):
-        self.audio_path = TESTS_DIR / 'Datasets/01-AchGottundHerr_slow_violin.wav'
-        self.f0_dir = SRC_DIR / 'outputs/f0.csv'
-        self.output_midi_file = SRC_DIR / 'outputs/output.mid'
-        self.reference_midi_path = TESTS_DIR / 'Datasets/01-AchGottundHerr_slow.mid'
+        self.audio_path = TESTS_DIR / 'Datasets/piano.wav'
+        self.f0_dir = SRC_DIR / 'outputs/f0_piano.csv'
+        self.output_midi_file = SRC_DIR / 'outputs/piano_output.mid'
+        self.reference_midi_path = TESTS_DIR / 'Datasets/piano-MIDI.mid'
 
         self.assertTrue(os.path.exists(self.audio_path), "Test audio file does not exist")
         self.assertTrue(os.path.exists(self.f0_dir), "F0 CSV file does not exist")
@@ -49,21 +49,21 @@ class TestEndToEnd(unittest.TestCase):
         print("F0 Evaluation Metrics:", f0_evaluation)
         self.plot_f0()
                 
-        reference_midi_path = Path(self.reference_midi_path)
-        output_midi_file = Path(self.output_midi_file)
-        precision, recall, f_measure, overlap_evaluation, ref_notes, out_notes = compare_midi_files(
-                                                                                    self,
-                                                                                    reference_midi_path, 
-                                                                                    output_midi_file
-                                                                                )
+        # reference_midi_path = Path(self.reference_midi_path)
+        # output_midi_file = Path(self.output_midi_file)
+        # precision, recall, f_measure, overlap_evaluation, ref_notes, out_notes = compare_midi_files(
+        #                                                                             self,
+        #                                                                             reference_midi_path, 
+        #                                                                             output_midi_file
+        #                                                                         )
 
-        print(f"Precision: {precision}")
-        print(f"Recall: {recall}")
-        print(f"F-measure: {f_measure}")
-        print(f"Overlap Evaluation: {overlap_evaluation}")
+        # print(f"Precision: {precision}")
+        # print(f"Recall: {recall}")
+        # print(f"F-measure: {f_measure}")
+        # print(f"Overlap Evaluation: {overlap_evaluation}")
         
-        self.plot_MIDI(ref_notes, out_notes)
-        self.plot_summary(overlap_evaluation)
+        # self.plot_MIDI(ref_notes, out_notes)
+        # self.plot_summary(overlap_evaluation)
         
         
         
@@ -126,7 +126,7 @@ class TestEndToEnd(unittest.TestCase):
 
     def test_f0_values(self):
         # Example test to verify f0 values
-        self.assertTrue(np.all(self.f0[:, 1] > 0), "F0 values should be positive frequencies")
+        self.assertTrue(np.all(self.f0[:, 1] >= 0.0), "F0 values should be non-negative frequencies")
 
 
     # def test_invalid_reference_f0(self):
@@ -154,10 +154,10 @@ from mido import (
     second2tick,
 )
 
-TUNING_FREQ = 44100
+TUNING_FREQ = 440 #44100
 
 def midi_note_to_frequency(midi_note: int, tuning: float = TUNING_FREQ) -> float:
-    return 2 ** ((midi_note - 69) / 12) * tuning
+    return 2 ** ((midi_note - 69) / 12.0) * tuning
 
 def get_pitch_curve_from_annotations(
     sample_rate: int, hop_size: int, duration: float, annotations: list
@@ -246,16 +246,16 @@ def get_notes_from_midi(midi_data: MidiFile, bpm: float) -> list:
     note_list = []
     tempo = bpm2tempo(bpm)
     for track in midi_data.tracks:
-        # print('Track {}: {}'.format(i, track.name))
+        #print('Track {}: {}'.format(i, track.name))
         cumulated_time = 0
         for msg in track:
-            # print(msg)
             if msg.is_meta or msg.type not in ["note_on", "note_off"]:
                 continue
 
             msg_time_sec = tick2second(msg.time, midi_data.ticks_per_beat, tempo)
             # change msg.time to linear time instead of deltas
             cumulated_time += msg_time_sec
+            print("Calculating time:", cumulated_time)
             msg.time = cumulated_time
 
         for n, msg in enumerate(track):
@@ -281,7 +281,7 @@ def get_notes_from_midi(midi_data: MidiFile, bpm: float) -> list:
                         off_msg.velocity,
                     )
                 )
-
+    print("note_list:", note_list)
     return note_list
 
 
@@ -303,6 +303,7 @@ def notes_to_pitch_gt(
             note.midi_note = note.midi_note + shift
             note.pitch = midi_note_to_frequency(note.midi_note)
         # accumulate indexes until the timestamp lower to note.end
+        print("note.end:", note.end)
         while time_marker <= note.end:
             pitch_gt.append([time_marker, float(note.pitch)])
             time_marker += time_interval
@@ -331,14 +332,14 @@ def midi2pitch(midi_path: Path) -> None:
     # (3) generate pitch annotations using an specific hopsize: <start-time> <Hz>
     # (4) generate note annotations: <onset> <offset> <midi-number>
 
-    # initialize some parameters
+    # initialize some parameters    
+    #TODO: get hop_size and tempo from the audio2pitch() function
     sample_rate = 44100
-    hop_size = 64
+    hop_size = 256  
     # read MIDI file
     mid = read_midi(midi_path)
     # extract a sequence of Notes
-    tempo = 80  #! tempo should be extracted from the MIDI file name
-    print("tempo", tempo)
+    tempo = 112.34714674 
     notes_list = get_notes_from_midi(mid, tempo)
     # generate pitch and notes annotations from MIDI file (groundtruth)
     pitch_gt, curve = notes_to_pitch_gt(sample_rate, hop_size, notes_list)

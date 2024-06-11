@@ -6,7 +6,8 @@ if __name__ == "__main__":
     audioName = input("Enter the name of the audio file: ")
     H, tempo, selected, time_f0 = a2p.audio2Pitch(audioName)
     
-    print("tempo:",tempo)
+    print("tempo:", tempo)
+    print("H:", H)
     sampling_rate = 44100
   
     p2m.pitch2midi(H, tempo, sampling_rate, time_f0, audioName)
