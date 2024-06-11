@@ -44,9 +44,8 @@ class TestEndToEnd(unittest.TestCase):
         H, tempo, selected, time_f0 = a2p.audio2Pitch(self.audio_name)
         sampling_rate = 44100
         p2m.pitch2midi(H, tempo, sampling_rate, time_f0, self.audio_name)
-                
-        self.reference_f0, self.ref_f0_curve, self.ref_notes_gt = m2p.midi2pitch(Path(self.reference_midi_path), sampling_rate, H, tempo[0]) 
-        f0_evaluation = mir_eval.melody.evaluate(self.ref_f0_curve[:, 0], self.ref_f0_curve[:, 1], self.f0[:, 0], self.f0[:, 1])
+        
+        f0_evaluation = eval.pitch_evaluation(self, H, sampling_rate, tempo)
         #print("\nF0 Evaluation Metrics:", f0_evaluation)
         vis.display_f0_evaluation_metrics(f0_evaluation)
         vis.plot_f0(self)
@@ -81,6 +80,6 @@ class TestEndToEnd(unittest.TestCase):
     def test_f0_values(self):
         self.assertTrue(np.all(self.f0[:, 1] >= 0.0), "F0 values should be non-negative frequencies")
 
-    
+
 if __name__ == '__main__':
     unittest.main()
