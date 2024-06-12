@@ -1,4 +1,5 @@
 import numpy as np
+import csv
 import mir_eval
 from pathlib import Path
 from midi2pitch import read_midi, get_notes_from_midi, notes_to_note_gt, midi2pitch
@@ -103,3 +104,30 @@ def assess_notes(
 
     # provide a single dict
     return {"overlap": overlap, "onset": onset, "offset": offset}
+
+
+def write_evaluation_metrics_to_csv(filename, f0_evaluation, note_metrics):
+    """
+    Write evaluation metrics to a CSV file.
+
+    Parameters:
+    - filename (str): Name of the CSV file to write.
+    - f0_evaluation (dict): Dictionary containing pitch evaluation metrics.
+    - note_metrics (dict): Dictionary containing note evaluation metrics.
+    """
+    with open(filename, mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # Write pitch evaluation metrics
+        writer.writerow(["Pitch Evaluation Metrics"])
+        for key, value in f0_evaluation.items():
+            writer.writerow([key, value])
+        
+        # Write note evaluation metrics
+        writer.writerow(["Note Evaluation Metrics"])
+        for metric, values in note_metrics.items():
+            writer.writerow([metric])
+            for sub_metric, sub_value in values.items():
+                writer.writerow([sub_metric, sub_value])
+                
+    print(f"Results saved to {filename}")

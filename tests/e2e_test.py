@@ -8,6 +8,7 @@ from pathlib import Path
 import evaluation as eval
 import visualizations as vis
 import midi2pitch as m2p
+from evaluation import write_evaluation_metrics_to_csv as write_csv
 
 # Get the current working directory
 script_dir = Path().resolve()
@@ -32,18 +33,19 @@ class TestEndToEnd(unittest.TestCase):
         self.reference_midi_path = TESTS_DIR / 'Datasets/piano-MIDI.mid'
         
         self.assertTrue(os.path.exists(self.audio_path), "Test audio file does not exist")
-        self.assertTrue(os.path.exists(self.f0_dir), "F0 CSV file does not exist")
-        self.assertTrue(os.path.exists(self.output_midi_file), "Output MIDI file does not exist")
-        self.assertTrue(os.path.exists(self.reference_midi_path), "Reference MIDI file does not exist")
-
-        self.x, self.fs = li.load(self.audio_path)
-        self.f0 = np.loadtxt(self.f0_dir, delimiter=',')
-       
+        self.assertTrue(os.path.exists(self.reference_midi_path), "Reference MIDI file does not exist")   
 
     def test_end_to_end(self):
         H, tempo, selected, time_f0 = a2p.audio2Pitch(self.audio_name)
         sampling_rate = 44100
         p2m.pitch2midi(H, tempo, sampling_rate, time_f0, self.audio_name)
+        
+        
+        self.assertTrue(os.path.exists(self.f0_dir), "F0 CSV file does not exist")
+        self.assertTrue(os.path.exists(self.output_midi_file), "Output MIDI file does not exist")
+        self.x, self.fs = li.load(self.audio_path)
+        self.f0 = np.loadtxt(self.f0_dir, delimiter=',')
+        self.assertTrue(np.all(self.f0[:, 1] >= 0.0), "F0 values should be non-negative frequencies")
         
         f0_evaluation = eval.pitch_evaluation(self, H, sampling_rate, tempo)
         #print("\nF0 Evaluation Metrics:", f0_evaluation)
@@ -66,6 +68,12 @@ class TestEndToEnd(unittest.TestCase):
         #print("\nNote Metrics:", note_metrics)
         vis.display_assess_notes_metrics(note_metrics)      
         
+        # Generate a unique filename for the results CSV
+        results_file = TESTS_DIR / f"outputs/results_{self.audio_name}.csv"
+
+        # Write evaluation metrics to CSV file
+        write_csv(results_file, f0_evaluation, note_metrics)
+        
 
     def test_invalid_audio_path(self):
         invalid_path = TESTS_DIR / 'Datasets/non_existent_file.wav'
@@ -77,8 +85,8 @@ class TestEndToEnd(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             np.loadtxt(invalid_f0_path, delimiter=',')
 
-    def test_f0_values(self):
-        self.assertTrue(np.all(self.f0[:, 1] >= 0.0), "F0 values should be non-negative frequencies")
+    # def test_f0_values(self):
+    #     self.assertTrue(np.all(self.f0[:, 1] >= 0.0), "F0 values should be non-negative frequencies")
 
 
 if __name__ == '__main__':
