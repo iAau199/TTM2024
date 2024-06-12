@@ -46,12 +46,12 @@ def get_user_input(prompt, valid_options):
             print("Invalid input. Please enter a number.")
 
 def audio2Pitch(audioName, flag=1):
-
+    dataset_dir = 'tests/Datasets/'
     nameSplit = audioName.split(".")
     if nameSplit[-1] == 'wav':
-        input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName
+        input_file = dataset_dir + audioName
     else:
-        input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
+        input_file = dataset_dir + audioName+'.wav'
         
     selected = get_user_input("Select input audio type, [1] normal, [2] high freq., [3] in progress, [4] Custom: ", [1, 2, 3, 4])
 
