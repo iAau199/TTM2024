@@ -18,7 +18,7 @@ from scipy.ndimage import gaussian_filter1d
 ################################################################
 #HOW TO USE THIS CODE:
 #Right after executing, write the name of the audio file you want to use.
-#After that, enter 1, 2 or 3 in the terminal.
+#After that, enter 1, 2, 3 or 4 in the terminal.
 #1: For melodies with a fundemental frequency between 120 and 500 Hz.
 #2: For human voice audios:
 #### After selecting human voices, select the pitch of the audio:
@@ -28,6 +28,7 @@ from scipy.ndimage import gaussian_filter1d
 #### 1: low frequencies (80-500 Hz)
 #### 2: medium frequencies (500-1000 Hz)
 #### 3: high frequencies (1000-10000 Hz)
+#4: Custom option: you can select the pitch range you want.
 #OUTPUT:
 #The script displays the histogram of the sound with the fundemental frequency highlited in a black line.
 #The fundemental frequency is also stored in a .cvs file.
@@ -52,7 +53,7 @@ def audio2Pitch(audioName, flag=1):
     else:
         input_file = 'src/Block_1_Audio2Pitch/sounds/'+audioName+'.wav'
         
-    selected = get_user_input("Select input audio type, [1] normal, [2] high freq., [3] in progress, [4] not sure: ", [1, 2, 3, 4])
+    selected = get_user_input("Select input audio type, [1] normal, [2] high freq., [3] in progress, [4] Custom: ", [1, 2, 3, 4])
 
     if selected == 1:       #Normal option
         window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
@@ -77,7 +78,7 @@ def audio2Pitch(audioName, flag=1):
         elif selected == 3:
             minf0 = 1000
             maxf0 = 10000
-    elif selected == 4:     #Secondary option (still in prossess)
+    elif selected == 4:     # Custom option
         window, M, N, f0et, t = 'blackman', 8000, 8192, 10, -55
         minf0 = int(input("Select min pitch range: "))
         maxf0 = int(input("Select max pitch range: "))
@@ -88,9 +89,17 @@ def audio2Pitch(audioName, flag=1):
     bpm, _ = li.beat.beat_track(y=x, sr=fs)
 
     M = N
-    # minf0 = 250
-    # maxf0 = 1000
-    w  = get_window(window, M)   
+    w  = get_window(window, M)
+    
+    if flag == 1:
+        # Display the spectrogram with selected frequency range
+        plot_spectrogram(x, fs, H, N, w, audioName, minf0, maxf0)
+    
+    adjust_freqs = input("Would you like to adjust the frequency range? (y/n): ")
+    if adjust_freqs.lower() == 'y':
+        minf0 = int(input("Enter new minimum pitch range: "))
+        maxf0 = int(input("Enter new maximum pitch range: "))
+    
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
     
     
@@ -98,10 +107,6 @@ def audio2Pitch(audioName, flag=1):
     f0 = medfilt(f0, kernel_size=5)
     # Further smooth using Gaussian filter
     f0 = gaussian_filter1d(f0, sigma=2)
-
-    # Plot the input audio spectrogram
-    if flag == 1:
-        plot_spectrogram(x, fs, H, N, w, audioName)
     
 
     maxplotfreq = maxf0    
@@ -138,7 +143,7 @@ def audio2Pitch(audioName, flag=1):
     return H, bpm, selected, output_data
 
 
-def plot_spectrogram(x, fs, H, N, w, audioName):
+def plot_spectrogram(x, fs, H, N, w, audioName, minf0=None, maxf0=None):
     D = li.stft(x, n_fft=N, hop_length=H, window=w)
     S_db = li.amplitude_to_db(np.abs(D), ref=np.max)
 
@@ -146,6 +151,13 @@ def plot_spectrogram(x, fs, H, N, w, audioName):
     li.display.specshow(S_db, sr=fs, hop_length=H, x_axis='time', y_axis='log')
     plt.colorbar(format='%+2.0f dB')
     plt.title(f'Spectrogram of {audioName} Audio')
+
+    if minf0 is not None and maxf0 is not None:
+        plt.axhline(y=minf0, color='r', linestyle='-', linewidth=1.5)
+        plt.axhline(y=maxf0, color='r', linestyle='-', linewidth=1.5)
+        plt.text(0, minf0 + 20, f'Min F0: {minf0} Hz', color='r', fontsize=10)
+        plt.text(0, maxf0 + 20, f'Max F0: {maxf0} Hz', color='r', fontsize=10)
+
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (Hz)')
     plt.show()
