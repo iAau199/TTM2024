@@ -25,11 +25,11 @@ import Block_2_Pitch2MIDI.pitch2midi as p2m
 
 class TestEndToEnd(unittest.TestCase):
     def setUp(self):
-        self.audio_name = 'piano'
-        self.audio_path = TESTS_DIR / 'Datasets/piano.wav'
-        self.f0_dir = SRC_DIR / 'outputs/f0_piano.csv'
-        self.output_midi_file = SRC_DIR / 'outputs/piano_output.mid'
-        self.reference_midi_path = TESTS_DIR / 'Datasets/piano-MIDI.mid'
+        self.audio_name = 'KSHMR-Guitar-100BPM-09'       
+        self.audio_path = TESTS_DIR / 'Datasets/KSHMR-Guitar-100BPM-09.wav'
+        self.f0_dir = SRC_DIR / 'outputs/f0_KSHMR-Guitar-100BPM-09.csv'
+        self.output_midi_file = SRC_DIR / 'outputs/KSHMR-Guitar-100BPM-09_output.mid'
+        self.reference_midi_path = TESTS_DIR / 'Datasets/KSHMR-Guitar-100BPM-09-MIDI.mid'
         
         self.assertTrue(os.path.exists(self.audio_path), "Test audio file does not exist")
         self.assertTrue(os.path.exists(self.f0_dir), "F0 CSV file does not exist")
@@ -41,11 +41,12 @@ class TestEndToEnd(unittest.TestCase):
        
 
     def test_end_to_end(self):
-        H, tempo, selected, time_f0 = a2p.audio2Pitch(self.audio_name)
-        sampling_rate = 44100
-        p2m.pitch2midi(H, tempo, sampling_rate, time_f0, self.audio_name)
         
-        f0_evaluation = eval.pitch_evaluation(self, H, sampling_rate, tempo)
+        self.H, self.tempo, selected, time_f0 = a2p.audio2Pitch(self.audio_name)
+        
+        self.sampling_rate = 44100
+        p2m.pitch2midi(self.H, self.tempo, self.sampling_rate, time_f0, self.audio_name)
+        f0_evaluation = eval.pitch_evaluation(self)
         #print("\nF0 Evaluation Metrics:", f0_evaluation)
         vis.display_f0_evaluation_metrics(f0_evaluation)
         vis.plot_f0(self)
