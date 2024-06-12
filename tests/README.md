@@ -18,3 +18,5 @@ To run the test suite, execute the e2e_test.py file using Python:
 
 ```python
 python tests/e2e_test.py
+
+Before executing, make sure you define the wanted `audio_name` to evaluate.
