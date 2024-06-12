@@ -4,8 +4,8 @@ from pathlib import Path
 from midi2pitch import read_midi, get_notes_from_midi, notes_to_note_gt, midi2pitch
 
 
-def pitch_evaluation(self):
-        self.reference_f0, self.ref_f0_curve, self.ref_notes_gt = midi2pitch(Path(self.reference_midi_path), self.sampling_rate, self.H, self.tempo[0]) 
+def pitch_evaluation(self, H, sampling_rate, tempo):
+        self.reference_f0, self.ref_f0_curve, self.ref_notes_gt = midi2pitch(Path(self.reference_midi_path), sampling_rate, H, tempo[0]) 
         f0_evaluation = mir_eval.melody.evaluate(self.ref_f0_curve[:, 0], self.ref_f0_curve[:, 1], self.f0[:, 0], self.f0[:, 1])
         return f0_evaluation
 
