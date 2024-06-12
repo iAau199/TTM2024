@@ -24,11 +24,11 @@ import Block_2_Pitch2MIDI.pitch2midi as p2m
 
 class TestEndToEnd(unittest.TestCase):
     def setUp(self):
-        self.audio_name = 'piano'
-        self.audio_path = TESTS_DIR / 'Datasets/piano.wav'
-        self.f0_dir = SRC_DIR / 'outputs/f0_piano.csv'
-        self.output_midi_file = SRC_DIR / 'outputs/piano_output.mid'
-        self.reference_midi_path = TESTS_DIR / 'Datasets/piano-MIDI.mid'
+        self.audio_name = 'sax-phrase'
+        self.audio_path = TESTS_DIR / f'Datasets/{self.audio_name}.wav'
+        self.f0_dir = SRC_DIR / f'outputs/f0_{self.audio_name}.csv'
+        self.output_midi_file = SRC_DIR / f'outputs/{self.audio_name}_output.mid'
+        self.reference_midi_path = TESTS_DIR / f'Datasets/{self.audio_name}-MIDI.mid'
         
         self.assertTrue(os.path.exists(self.audio_path), "Test audio file does not exist")
         self.assertTrue(os.path.exists(self.reference_midi_path), "Reference MIDI file does not exist")   
