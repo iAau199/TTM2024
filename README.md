@@ -6,6 +6,7 @@ Audio2Midi Converter TuneTrek is a tool created to convert audio signals into MI
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Directory Structure](#directory_structure)
 - [License](#license)
 
 ## Installation
