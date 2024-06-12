@@ -2,12 +2,10 @@ import os
 import sys
 import unittest
 import numpy as np
-import mir_eval
 import librosa as li
 from pathlib import Path
 import evaluation as eval
 import visualizations as vis
-import midi2pitch as m2p
 from evaluation import write_evaluation_metrics_to_csv as write_csv
 
 # Get the current working directory
