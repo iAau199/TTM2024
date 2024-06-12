@@ -111,8 +111,3 @@ audio2midi/
     │ 
     └── e2e_test.py
 ```
-
-
-## License
-
-This work is licensed under CC BY-SA 4.0 - see the [LICENSE.md](LICENSE.md) file for details.
