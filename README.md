@@ -74,7 +74,7 @@ To use TuneTrek for converting audio files to MIDI, follow these steps:
 
     **Note:** Whenever an image is displayed, you need to close the image window for the code to continue executing.
 
-. **Adjust the frequency range if needed:**
+5. **Adjust the frequency range if needed:**
 
     You will be asked if you want to adjust the minimum and maximum frequencies. Answer with **y** (yes) or **n** (no). If you choose **y**, you will be prompted to enter the new frequency ranges.
 
