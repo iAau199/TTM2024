@@ -1,38 +1,18 @@
 import os
-import sys
-import csv
-import matplotlib.pyplot as plt
 import numpy as np
 import librosa as li
+from scipy.signal import get_window, medfilt
+from scipy.ndimage import gaussian_filter1d
+import matplotlib.pyplot as plt
+from tkinter import messagebox
+from tkinter import filedialog, messagebox, simpledialog
 
-from scipy.signal import get_window
+import sys
 sys.path.append('src/Block_1_Audio2Pitch/PSPM/')
 import dftModel as DFT
 import utilFunctions as UF
 import harmonicModel as HM
 import stft
-
-from scipy.signal import get_window, medfilt
-from scipy.ndimage import gaussian_filter1d
-
-################################################################
-#HOW TO USE THIS CODE:
-#Right after executing, write the name of the audio file you want to use.
-#After that, enter 1, 2, 3 or 4 in the terminal.
-#1: For melodies with a fundemental frequency between 120 and 500 Hz.
-#2: For human voice audios:
-#### After selecting human voices, select the pitch of the audio:
-#### 1: low frequencies (80-500 Hz)
-#### 2: high frequencies (500-1000 Hz)
-#3: For instruments audio:
-#### 1: low frequencies (80-500 Hz)
-#### 2: medium frequencies (500-1000 Hz)
-#### 3: high frequencies (1000-10000 Hz)
-#4: Custom option: you can select the pitch range you want.
-#OUTPUT:
-#The script displays the histogram of the sound with the fundemental frequency highlited in a black line.
-#The fundemental frequency is also stored in a .cvs file.
-################################################################
 
 def get_user_input(prompt, valid_options):
     while True:
@@ -45,15 +25,16 @@ def get_user_input(prompt, valid_options):
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-def audio2Pitch(audioName, flag=1):
+def audio2Pitch(audioName, flag=1, selected=None, minf0=None, maxf0=None):
     dataset_dir = 'tests/Datasets/'
     nameSplit = audioName.split(".")
     if nameSplit[-1] == 'wav':
         input_file = dataset_dir + audioName
     else:
         input_file = dataset_dir + audioName+'.wav'
-        
-    selected = get_user_input("Select input audio type:\n   [1] melodies with f[120-500]Hz \n   [2] human voice \n   [3] instrumental audios (in progress) \n   [4] Custom freq.\n ", [1, 2, 3, 4])
+    
+    if selected is None or minf0 is None or maxf0 is None:
+        selected = get_user_input("Select input audio type:\n   [1] melodies with f[120-500]Hz \n   [2] human voice \n   [3] instrumental audios (in progress) \n   [4] Custom freq.\n ", [1, 2, 3, 4])
 
     if selected == 1:       #Normal option
         window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
@@ -83,7 +64,6 @@ def audio2Pitch(audioName, flag=1):
         minf0 = int(input("Select min pitch range: "))
         maxf0 = int(input("Select max pitch range: "))
 
-
     H = 256 
     x, fs = li.load(input_file)
     bpm, _ = li.beat.beat_track(y=x, sr=fs)
@@ -95,20 +75,19 @@ def audio2Pitch(audioName, flag=1):
         # Display the spectrogram with selected frequency range
         plot_spectrogram(x, fs, H, N, w, audioName, minf0, maxf0)
     
-    adjust_freqs = input("Would you like to adjust the frequency range? (y/n): ")
-    if adjust_freqs.lower() == 'y':
-        minf0 = int(input("Enter new minimum pitch range: "))
-        maxf0 = int(input("Enter new maximum pitch range: "))
+    adjust_freqs = messagebox.askquestion("Adjust Frequency Range", "Would you like to adjust the frequency range?")
+    if adjust_freqs == 'yes':
+        minf0 = simpledialog.askinteger("Minimum Frequency", "Enter new minimum pitch range:", initialvalue=minf0)
+        maxf0 = simpledialog.askinteger("Maximum Frequency", "Enter new maximum pitch range:", initialvalue=maxf0)
+
     
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et) 
-    
     
     # Smooth the f0 track using a median filter
     f0 = medfilt(f0, kernel_size=5)
     # Further smooth using Gaussian filter
     f0 = gaussian_filter1d(f0, sigma=2)
     
-
     maxplotfreq = maxf0    
     fig = plt.figure(figsize=(13, 7))
 
@@ -142,7 +121,6 @@ def audio2Pitch(audioName, flag=1):
 
     return H, bpm, selected, output_data
 
-
 def plot_spectrogram(x, fs, H, N, w, audioName, minf0=None, maxf0=None):
     D = li.stft(x, n_fft=N, hop_length=H, window=w)
     S_db = li.amplitude_to_db(np.abs(D), ref=np.max)
@@ -161,3 +139,14 @@ def plot_spectrogram(x, fs, H, N, w, audioName, minf0=None, maxf0=None):
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (Hz)')
     plt.show()
+
+if __name__ == "__main__":
+    audioName = input("Enter the name of the audio file: ")
+    H, tempo, selected, time_f0 = audio2Pitch(audioName)
+    
+    print("tempo:", tempo)
+    print("H:", H)
+    sampling_rate = 44100
+  
+    # Uncomment the next line if you want to run pitch2midi directly after audio2Pitch
+    # p2m.pitch2midi(H, tempo, sampling_rate, time_f0, audioName)
