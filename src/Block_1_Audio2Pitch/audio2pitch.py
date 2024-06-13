@@ -61,8 +61,8 @@ def audio2Pitch(audioName, flag=1, selected=None, minf0=None, maxf0=None):
             maxf0 = 10000
     elif selected == 4:     # Custom option
         window, M, N, f0et, t = 'blackman', 8000, 8192, 10, -55
-        minf0 = int(input("Select min pitch range: "))
-        maxf0 = int(input("Select max pitch range: "))
+        # minf0 = int(input("Select min pitch range: "))
+        # maxf0 = int(input("Select max pitch range: "))
 
     H = 256 
     x, fs = li.load(input_file)
