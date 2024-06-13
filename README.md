@@ -1,5 +1,7 @@
 # TuneTrek
 
+![Logo Image](TuneTrek.png)
+
 Audio2Midi Converter TuneTrek is a tool created to convert audio signals into MIDI (Musical Instrument Digital Interface) data.
 
 ## Table of Contents
