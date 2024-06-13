@@ -1,1 +1,0 @@
-In this folder we will have everything related to Block 3.

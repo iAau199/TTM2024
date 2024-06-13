@@ -1,0 +1,6 @@
+librosa
+mir_eval
+pretty_midi
+matplotlib
+setuptools
+tabulate
