@@ -4,6 +4,7 @@ from tkinter import filedialog, messagebox, simpledialog
 import matplotlib.pyplot as plt
 import numpy as np
 import librosa as li
+from PIL import Image, ImageTk
 from scipy.signal import get_window, medfilt
 from scipy.ndimage import gaussian_filter1d
 from Block_1_Audio2Pitch import audio2pitch as a2p
@@ -65,9 +66,21 @@ def convert_file():
 app = tk.Tk()
 app.title("Audio to MIDI Converter")
 
+# Load logo and name images
+
+# Load and display logo
+logo_path = 'TuneTrek.png'
+if os.path.exists(logo_path):
+    logo_img = Image.open(logo_path)
+    logo_img = logo_img.resize((100, 104)) 
+    logo_img = ImageTk.PhotoImage(logo_img)
+    logo_label = tk.Label(app, image=logo_img)
+    logo_label.pack(pady=10)
+
+
 # File selection frame
 file_frame = tk.Frame(app)
-file_frame.pack(pady=20)
+file_frame.pack(pady=10)
 
 file_label = tk.Label(file_frame, text="Selected File: None")
 file_label.pack()
