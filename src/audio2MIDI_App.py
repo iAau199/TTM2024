@@ -93,7 +93,7 @@ audio_type_var = tk.StringVar()
 audio_type_frame = tk.LabelFrame(app, text="Select Audio Type")
 audio_type_frame.pack(pady=20)
 
-audio_types = ["Melodies (120-500 Hz)", "Human Voice", "Instrumental Audios", "Custom"]
+audio_types = ["Synthetic (120-500 Hz)", "Human Voice", "Instrumental Audios", "Custom"]
 for audio_type in audio_types:
     rb = tk.Radiobutton(audio_type_frame, text=audio_type, variable=audio_type_var, value=audio_type)
     rb.pack(anchor=tk.W)

@@ -34,7 +34,7 @@ def audio2Pitch(audioName, flag=1, selected=None, minf0=None, maxf0=None):
         input_file = dataset_dir + audioName+'.wav'
     
     if selected is None or minf0 is None or maxf0 is None:
-        selected = get_user_input("Select input audio type:\n   [1] melodies with f[120-500]Hz \n   [2] human voice \n   [3] instrumental audios (in progress) \n   [4] Custom freq.\n ", [1, 2, 3, 4])
+        selected = get_user_input("Select input audio type:\n   [1] Synthetic with f[120-500]Hz \n   [2] human voice \n   [3] instrumental audios (in progress) \n   [4] Custom freq.\n ", [1, 2, 3, 4])
 
     if selected == 1:       #Normal option
         window, M, N, f0et, t, minf0, maxf0 = 'hamming', 8000, 8192, 10, -55, 120, 500
