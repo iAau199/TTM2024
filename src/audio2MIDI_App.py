@@ -28,7 +28,7 @@ def convert_file():
         messagebox.showerror("Error", "Please select a file.")
         return
 
-    if audio_type == "Melodies (120-500 Hz)":
+    if audio_type == "Synthetic (120-500 Hz)":
         audio_type_code = 1
         min_freq = 120
         max_freq = 500
