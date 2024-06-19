@@ -4,3 +4,4 @@ pretty_midi
 matplotlib
 setuptools
 tabulate
+cython
