@@ -60,7 +60,7 @@ This Python application allows users to convert audio files into MIDI format usi
    Run the application by executing the `audio2MIDI_App.py` script. This will open a graphical interface where you can interact with the app.
 
    ```bash
-   python audio2MIDI_App.py
+   python src/audio2MIDI_App.py
    ```
 
 2. **Select an Audio File**
